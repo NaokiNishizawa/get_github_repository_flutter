@@ -14,17 +14,17 @@ abstract class ApiClient {
 /// 通信クラス　実体
 class ApiClientImpl extends ApiClient {
   final _endpoint = 'https://api.github.com/graphql';
-  final _accessToken = dotenv.get('ACCESS_TOKEN');
   GraphQLClient? _client;
   final _logger = Logger();
 
   void init() {
+    final accessToken = dotenv.get('ACCESS_TOKEN');
     final httpLink = HttpLink(
       _endpoint,
     );
 
     final AuthLink authLink = AuthLink(
-      getToken: () => 'Bearer $_accessToken',
+      getToken: () => 'Bearer $accessToken',
     );
 
     final Link link = authLink.concat(httpLink);

@@ -5,20 +5,14 @@ import 'package:src/repositories/repositoriesRepository.dart';
 
 final repositoriesViewModelProvider = StateNotifierProvider.autoDispose<
     RepositoriesViewModel, AsyncValue<RepositoriesResponse?>>(
-  (ref) => RepositoriesViewModelImpl(
+  (ref) => RepositoriesViewModel(
     ref.watch(repositoriesRepositoryProvider),
   ),
 );
 
-abstract class RepositoriesViewModel {
-  Future<RepositoriesResponse?> search(String searchWord, int limit);
-}
-
-class RepositoriesViewModelImpl
-    extends StateNotifier<AsyncValue<RepositoriesResponse?>>
-    implements RepositoriesViewModel {
-  RepositoriesViewModelImpl(this._repository)
-      : super(const AsyncValue.data(null));
+class RepositoriesViewModel
+    extends StateNotifier<AsyncValue<RepositoriesResponse?>> {
+  RepositoriesViewModel(this._repository) : super(const AsyncValue.data(null));
 
   final RepositoriesRepository _repository;
   final _logger = Logger();
