@@ -6,10 +6,12 @@ import 'package:src/viewmodels/repositoriesViewModel.dart';
 import 'package:src/widgets/scroll_detector.dart';
 import 'package:stack_trace/stack_trace.dart' as stack_trace;
 
+final searchTextController = TextEditingController();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initHiveForFlutter();
-  await dotenv.load();
+  await dotenv.load(fileName: "assets/.env");
 
   FlutterError.demangleStackTrace = (StackTrace stack) {
     if (stack is stack_trace.Trace) {
@@ -56,41 +58,59 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   Widget build(BuildContext context) {
     final response = ref.watch(repositoriesViewModelProvider);
     final viewModel = ref.watch(repositoriesViewModelProvider.notifier);
-    final searchTextController = TextEditingController();
     const threshold = 0.7;
-    int limit = 10;
+    bool isShowProgress = true;
 
     Widget searchTextField() {
-      return TextField(
-        controller: searchTextController,
-        autofocus: true,
-        //TextFieldが表示されるときにフォーカスする（キーボードを表示する）
-        cursorColor: Colors.white,
-        //カーソルの色
-        style: const TextStyle(
-          //テキストのスタイル
-          color: Colors.black,
-          fontSize: 20,
-        ),
-        textInputAction: TextInputAction.search,
-        //キーボードのアクションボタンを指定
-        decoration: const InputDecoration(
-          //TextFiledのスタイル
-          enabledBorder: UnderlineInputBorder(
-              //デフォルトのTextFieldの枠線
-              borderSide: BorderSide(color: Colors.grey)),
-          focusedBorder: UnderlineInputBorder(
-              //TextFieldにフォーカス時の枠線
-              borderSide: BorderSide(color: Colors.grey)),
-          hintText: 'Search GitHub', //何も入力してないときに表示されるテキスト
-          hintStyle: TextStyle(
-            //hintTextのスタイル
-            color: Colors.black12,
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: TextField(
+          controller: searchTextController,
+          autofocus: true,
+          //TextFieldが表示されるときにフォーカスする（キーボードを表示する）
+          cursorColor: Colors.grey,
+          //カーソルの色
+          style: const TextStyle(
+            //テキストのスタイル
+            color: Colors.black,
             fontSize: 20,
           ),
+          textInputAction: TextInputAction.search,
+          //キーボードのアクションボタンを指定
+          decoration: const InputDecoration(
+            //TextFiledのスタイル
+            enabledBorder: UnderlineInputBorder(
+                //デフォルトのTextFieldの枠線
+                borderSide: BorderSide(color: Colors.grey)),
+            focusedBorder: UnderlineInputBorder(
+                //TextFieldにフォーカス時の枠線
+                borderSide: BorderSide(color: Colors.grey)),
+            hintText: 'Search GitHub', //何も入力してないときに表示されるテキスト
+            hintStyle: TextStyle(
+              //hintTextのスタイル
+              color: Colors.black12,
+              fontSize: 20,
+            ),
+          ),
+          onEditingComplete: () {
+            viewModel.search(searchTextController.text);
+            FocusScope.of(context).unfocus();
+          },
         ),
-        onEditingComplete: () {
-          viewModel.search(searchTextController.text, limit);
+      );
+    }
+
+    void showProgressDialog() {
+      showGeneralDialog(
+        context: context,
+        barrierDismissible: false,
+        transitionDuration: const Duration(milliseconds: 300),
+        barrierColor: Colors.black.withOpacity(0.5),
+        pageBuilder: (BuildContext context, Animation<dynamic> animation,
+            Animation<dynamic> secondaryAnimation) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         },
       );
     }
@@ -105,26 +125,50 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             response.when(
               data: (repositoriesResponse) {
                 if (repositoriesResponse == null) {
-                  return const Text('検索した結果、該当のレポジトリはありませんでした。');
+                  return const Text('検索文字列を入力してください。');
                 }
-
                 // Listで表示する
-                return ScrollDetector(
-                  builder: (context, scrollController) => ListView.builder(
-                    controller: scrollController,
-                    itemCount: repositoriesResponse.nodes.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Column(
-                        children: [
-                          Text(repositoriesResponse.nodes[index].name),
-                        ],
-                      );
+                return Expanded(
+                  child: ScrollDetector(
+                    builder: (context, scrollController) => ListView.builder(
+                      controller: scrollController,
+                      itemCount: repositoriesResponse.nodes.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Column(
+                          children: [
+                            Text(
+                              repositoriesResponse.nodes[index].name,
+                              style: const TextStyle(
+                                fontSize: 20,
+                              ),
+                            ),
+                            Text(
+                              repositoriesResponse.nodes[index].url,
+                              style: const TextStyle(
+                                fontSize: 20,
+                              ),
+                            ),
+                            const Divider(),
+                          ],
+                        );
+                      },
+                    ),
+                    loadNext: (scrollController) async {
+                      // ダイアログを出して、新しい部分を読み込む
+                      if (isShowProgress) {
+                        isShowProgress = false;
+                        showProgressDialog();
+                        await viewModel.loadNext(searchTextController.text);
+
+                        if (!mounted) {
+                          return;
+                        }
+                        Navigator.of(context, rootNavigator: true).pop();
+                        isShowProgress = true;
+                      }
                     },
+                    threshold: threshold,
                   ),
-                  loadNext: (scrollController) {
-                    // TODO
-                  },
-                  threshold: threshold,
                 );
               },
               error: (error, stack) {

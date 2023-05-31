@@ -10,7 +10,7 @@ _$_Node _$$_NodeFromJson(Map<String, dynamic> json) => _$_Node(
       id: json['id'] as String,
       name: json['name'] as String,
       url: json['url'] as String,
-      updatedAt: json['updatedAt'] as String,
+      updatedAt: json['updatedAt'] as String?,
     );
 
 Map<String, dynamic> _$$_NodeToJson(_$_Node instance) => <String, dynamic>{
@@ -31,5 +31,5 @@ _$_RepositoriesResponse _$$_RepositoriesResponseFromJson(
 Map<String, dynamic> _$$_RepositoriesResponseToJson(
         _$_RepositoriesResponse instance) =>
     <String, dynamic>{
-      'nodes': instance.nodes,
+      'nodes': instance.nodes.map((e) => e.toJson()).toList(),
     };

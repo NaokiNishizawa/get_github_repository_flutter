@@ -9,7 +9,7 @@ class Node with _$Node {
     required final String id,
     required final String name,
     required final String url,
-    required final String updatedAt,
+    required final String? updatedAt,
   }) = _Node;
 
   factory Node.fromJson(Map<String, dynamic> json) => _$NodeFromJson(json);
@@ -17,9 +17,11 @@ class Node with _$Node {
 
 @freezed
 class RepositoriesResponse with _$RepositoriesResponse {
+  @JsonSerializable(explicitToJson: true)
   const factory RepositoriesResponse({
     required final List<Node> nodes,
   }) = _RepositoriesResponse;
+  const RepositoriesResponse._();
 
   factory RepositoriesResponse.fromJson(Map<String, dynamic> json) =>
       _$RepositoriesResponseFromJson(json);

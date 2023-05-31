@@ -45,7 +45,10 @@ class RepositoriesRemoteDataSourceImpl extends RepositoriesRemoteDataSource {
     if (result.exception != null) {
       return null;
     }
-    return RepositoriesResponse.fromJson(
-        jsonDecode(result.data?['search']) as Map<String, dynamic>);
+
+    final nodesList = result.data?['search'] as Map<String, dynamic>;
+    final jsonStr = jsonEncode(nodesList);
+
+    return RepositoriesResponse.fromJson(jsonDecode(jsonStr));
   }
 }

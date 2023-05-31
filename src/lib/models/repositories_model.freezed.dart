@@ -23,7 +23,7 @@ mixin _$Node {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get url => throw _privateConstructorUsedError;
-  String get updatedAt => throw _privateConstructorUsedError;
+  String? get updatedAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -35,7 +35,7 @@ abstract class $NodeCopyWith<$Res> {
   factory $NodeCopyWith(Node value, $Res Function(Node) then) =
       _$NodeCopyWithImpl<$Res, Node>;
   @useResult
-  $Res call({String id, String name, String url, String updatedAt});
+  $Res call({String id, String name, String url, String? updatedAt});
 }
 
 /// @nodoc
@@ -54,7 +54,7 @@ class _$NodeCopyWithImpl<$Res, $Val extends Node>
     Object? id = null,
     Object? name = null,
     Object? url = null,
-    Object? updatedAt = null,
+    Object? updatedAt = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -69,10 +69,10 @@ class _$NodeCopyWithImpl<$Res, $Val extends Node>
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String,
-      updatedAt: null == updatedAt
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ) as $Val);
   }
 }
@@ -83,7 +83,7 @@ abstract class _$$_NodeCopyWith<$Res> implements $NodeCopyWith<$Res> {
       __$$_NodeCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String name, String url, String updatedAt});
+  $Res call({String id, String name, String url, String? updatedAt});
 }
 
 /// @nodoc
@@ -98,7 +98,7 @@ class __$$_NodeCopyWithImpl<$Res> extends _$NodeCopyWithImpl<$Res, _$_Node>
     Object? id = null,
     Object? name = null,
     Object? url = null,
-    Object? updatedAt = null,
+    Object? updatedAt = freezed,
   }) {
     return _then(_$_Node(
       id: null == id
@@ -113,10 +113,10 @@ class __$$_NodeCopyWithImpl<$Res> extends _$NodeCopyWithImpl<$Res, _$_Node>
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String,
-      updatedAt: null == updatedAt
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ));
   }
 }
@@ -139,7 +139,7 @@ class _$_Node implements _Node {
   @override
   final String url;
   @override
-  final String updatedAt;
+  final String? updatedAt;
 
   @override
   String toString() {
@@ -181,7 +181,7 @@ abstract class _Node implements Node {
       {required final String id,
       required final String name,
       required final String url,
-      required final String updatedAt}) = _$_Node;
+      required final String? updatedAt}) = _$_Node;
 
   factory _Node.fromJson(Map<String, dynamic> json) = _$_Node.fromJson;
 
@@ -192,7 +192,7 @@ abstract class _Node implements Node {
   @override
   String get url;
   @override
-  String get updatedAt;
+  String? get updatedAt;
   @override
   @JsonKey(ignore: true)
   _$$_NodeCopyWith<_$_Node> get copyWith => throw _privateConstructorUsedError;
@@ -280,10 +280,12 @@ class __$$_RepositoriesResponseCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
-class _$_RepositoriesResponse implements _RepositoriesResponse {
+
+@JsonSerializable(explicitToJson: true)
+class _$_RepositoriesResponse extends _RepositoriesResponse {
   const _$_RepositoriesResponse({required final List<Node> nodes})
-      : _nodes = nodes;
+      : _nodes = nodes,
+        super._();
 
   factory _$_RepositoriesResponse.fromJson(Map<String, dynamic> json) =>
       _$$_RepositoriesResponseFromJson(json);
@@ -329,9 +331,10 @@ class _$_RepositoriesResponse implements _RepositoriesResponse {
   }
 }
 
-abstract class _RepositoriesResponse implements RepositoriesResponse {
+abstract class _RepositoriesResponse extends RepositoriesResponse {
   const factory _RepositoriesResponse({required final List<Node> nodes}) =
       _$_RepositoriesResponse;
+  const _RepositoriesResponse._() : super._();
 
   factory _RepositoriesResponse.fromJson(Map<String, dynamic> json) =
       _$_RepositoriesResponse.fromJson;
