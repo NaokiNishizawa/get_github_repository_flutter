@@ -5,6 +5,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:src/viewmodels/repositoriesViewModel.dart';
 import 'package:src/widgets/scroll_detector.dart';
 import 'package:stack_trace/stack_trace.dart' as stack_trace;
+import 'package:url_launcher/url_launcher.dart';
 
 final searchTextController = TextEditingController();
 
@@ -100,6 +101,11 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       );
     }
 
+    Future<void> launchRepositoryUrl(String urlStr) async {
+      final url = Uri.parse(urlStr);
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -128,7 +134,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                     itemCount: repositoriesResponse.nodes.length,
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          launchRepositoryUrl(
+                              repositoriesResponse.nodes[index].url);
+                        },
                         child: Column(
                           children: [
                             Text(
