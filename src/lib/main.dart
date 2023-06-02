@@ -116,6 +116,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               if (repositoriesResponse == null) {
                 return const Text('検索文字列を入力してください。');
               }
+
+              if (repositoriesResponse.nodes.isEmpty) {
+                return const Text('検索した結果該当のレポジトリはありませんでした。');
+              }
               // Listで表示する
               return Expanded(
                 child: ScrollDetector(
