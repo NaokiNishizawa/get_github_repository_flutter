@@ -59,7 +59,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     final response = ref.watch(repositoriesViewModelProvider);
     final viewModel = ref.watch(repositoriesViewModelProvider.notifier);
     const threshold = 0.7;
-    bool isShowProgress = true;
+    bool isLoading = false;
 
     Widget searchTextField() {
       return Padding(
@@ -97,21 +97,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             FocusScope.of(context).unfocus();
           },
         ),
-      );
-    }
-
-    void showProgressDialog() {
-      showGeneralDialog(
-        context: context,
-        barrierDismissible: false,
-        transitionDuration: const Duration(milliseconds: 300),
-        barrierColor: Colors.black.withOpacity(0.5),
-        pageBuilder: (BuildContext context, Animation<dynamic> animation,
-            Animation<dynamic> secondaryAnimation) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
       );
     }
 
@@ -162,17 +147,11 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                     },
                   ),
                   loadNext: (scrollController) async {
-                    // ダイアログを出して、新しい部分を読み込む
-                    if (isShowProgress) {
-                      isShowProgress = false;
-                      showProgressDialog();
+                    // 新しい部分を読み込む
+                    if (!isLoading) {
+                      isLoading = true;
                       await viewModel.loadNext(searchTextController.text);
-
-                      if (!mounted) {
-                        return;
-                      }
-                      Navigator.of(context, rootNavigator: true).pop();
-                      isShowProgress = true;
+                      isLoading = false;
                     }
                   },
                   threshold: threshold,
