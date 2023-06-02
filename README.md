@@ -12,6 +12,20 @@
     - 今回は小規模のプロジェクトだったため
     - 各クラスの責務を分けるため
 
+## 全体構成
+- view
+    - UI部分
+
+- viewModel
+    - viewとrepositoryを繋ぐ
+
+- repository
+    - API通信を行うdataSourceとviewModelを繋ぐ
+
+- dataSource
+    - 責務としてAPI通信を行う
+
+
 ## 工夫点
 
 1. envファイルを利用して機密情報を隠すことを実現
