@@ -116,25 +116,31 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     }
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: Column(
-          children: [
-            searchTextField(),
-            response.when(
-              data: (repositoriesResponse) {
-                if (repositoriesResponse == null) {
-                  return const Text('検索文字列を入力してください。');
-                }
-                // Listで表示する
-                return Expanded(
-                  child: ScrollDetector(
-                    builder: (context, scrollController) => ListView.builder(
-                      controller: scrollController,
-                      itemCount: repositoriesResponse.nodes.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Column(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Column(
+        children: [
+          searchTextField(),
+          const SizedBox(
+            width: double.infinity,
+            height: 20,
+          ),
+          response.when(
+            data: (repositoriesResponse) {
+              if (repositoriesResponse == null) {
+                return const Text('検索文字列を入力してください。');
+              }
+              // Listで表示する
+              return Expanded(
+                child: ScrollDetector(
+                  builder: (context, scrollController) => ListView.builder(
+                    controller: scrollController,
+                    itemCount: repositoriesResponse.nodes.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () {},
+                        child: Column(
                           children: [
                             Text(
                               repositoriesResponse.nodes[index].name,
@@ -146,37 +152,40 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                               repositoriesResponse.nodes[index].url,
                               style: const TextStyle(
                                 fontSize: 20,
+                                color: Colors.grey,
                               ),
                             ),
                             const Divider(),
                           ],
-                        );
-                      },
-                    ),
-                    loadNext: (scrollController) async {
-                      // ダイアログを出して、新しい部分を読み込む
-                      if (isShowProgress) {
-                        isShowProgress = false;
-                        showProgressDialog();
-                        await viewModel.loadNext(searchTextController.text);
-
-                        if (!mounted) {
-                          return;
-                        }
-                        Navigator.of(context, rootNavigator: true).pop();
-                        isShowProgress = true;
-                      }
+                        ),
+                      );
                     },
-                    threshold: threshold,
                   ),
-                );
-              },
-              error: (error, stack) {
-                return Text(error.toString());
-              },
-              loading: () => const CircularProgressIndicator(),
-            ),
-          ],
-        ));
+                  loadNext: (scrollController) async {
+                    // ダイアログを出して、新しい部分を読み込む
+                    if (isShowProgress) {
+                      isShowProgress = false;
+                      showProgressDialog();
+                      await viewModel.loadNext(searchTextController.text);
+
+                      if (!mounted) {
+                        return;
+                      }
+                      Navigator.of(context, rootNavigator: true).pop();
+                      isShowProgress = true;
+                    }
+                  },
+                  threshold: threshold,
+                ),
+              );
+            },
+            error: (error, stack) {
+              return Text(error.toString());
+            },
+            loading: () => const CircularProgressIndicator(),
+          ),
+        ],
+      ),
+    );
   }
 }
